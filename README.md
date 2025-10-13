@@ -4,13 +4,13 @@ A robust REST API built with Spring Boot for user registration, authentication, 
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Configuration](#configuration)
-- [Project Structure](#project-structure)
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [Getting Started](#-getting-started)
+- [API Endpoints](#-api-endpoints)
+- [Database Schema](#️-database-schema)
+- [Configuration](#️-configuration)
+- [Project Structure](#-project-structure)
 
 ## ✨ Features
 
