@@ -1,12 +1,12 @@
 package com.antonia.dev.userapi.controller;
 
 import com.antonia.dev.userapi.dto.CreateUserRequest;
+import com.antonia.dev.userapi.dto.DeleteResponse;
 import com.antonia.dev.userapi.dto.UserDTO;
 import com.antonia.dev.userapi.dto.UserUpdateSelfRequest;
-import com.antonia.dev.userapi.entity.Role;
-import com.antonia.dev.userapi.repository.UserRepository;
 import com.antonia.dev.userapi.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,12 +17,9 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -58,9 +55,9 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/role/{role}")
-    public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable Role role) {
-        return ResponseEntity.ok(userService.getUsersByRole(role));
+    @GetMapping("/role/{roleName}")
+    public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable String roleName) {
+        return ResponseEntity.ok(userService.getUsersByRole(roleName));
     }
 
     @PostMapping
@@ -107,9 +104,16 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<DeleteResponse> deleteUser(@PathVariable Long id) {
         return userService.delete(id)
-                .map(user -> ResponseEntity.noContent().<Void>build())
+                .map(role -> {
+                    DeleteResponse response = new DeleteResponse(
+                            "Role deleted successfully",
+                            role.getId(),
+                            role.getName()
+                    );
+                    return ResponseEntity.ok(response);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -18,5 +18,5 @@ public record CreateUserRequest(
     @Size(min = 6, message = "Password must be at least 6 characters long")
     String password,
     
-    Role role
+    String roleName
 ) {}

@@ -17,7 +17,7 @@ public interface UserService {
     Optional<UserDTO> getUserByNickname(String nickname);
 
     List<UserDTO> getUsersByName(String name);
-    List<UserDTO> getUsersByRole(Role role);
+    List<UserDTO> getUsersByRole(String roleName);
 
     UserDTO createUser(CreateUserRequest user);
     Optional<UserDTO> updateSelf(Long id, UserUpdateSelfRequest request);

@@ -4,11 +4,12 @@ import com.antonia.dev.userapi.dto.CreateUserRequest;
 import com.antonia.dev.userapi.dto.UserDTO;
 import com.antonia.dev.userapi.dto.ErrorResponse;
 import com.antonia.dev.userapi.dto.UserUpdateSelfRequest;
-import com.antonia.dev.userapi.entity.Role;
 import com.antonia.dev.userapi.entity.User;
+import com.antonia.dev.userapi.exception.RoleNotFoundException;
 import com.antonia.dev.userapi.exception.UserNotFoundException;
 import com.antonia.dev.userapi.exception.UserValidationException;
 import com.antonia.dev.userapi.mapper.UserMapper;
+import com.antonia.dev.userapi.repository.RoleRepository;
 import com.antonia.dev.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -63,8 +65,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getUsersByRole(Role role) {
-        return userRepository.findByRole(role)
+    public List<UserDTO> getUsersByRole(String roleName) {
+        roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RoleNotFoundException("roleName", "Role not found with name: " + roleName));
+        
+        return userRepository.findByRoleName(roleName)
                 .stream()
                 .map(userMapper::toDTO)
                 .toList();
@@ -73,8 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(CreateUserRequest request) {
         User user = userMapper.toEntity(request);
-
-        prepareUserForCreation(user);
+        validateAndSetupUser(user, request.roleName());
 
         User saved = userRepository.save(user);
         return userMapper.toDTO(saved);
@@ -83,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> updateSelf(Long id, UserUpdateSelfRequest request) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("id", "User not found"));
+                .orElseThrow(() -> new UserNotFoundException("id", "User not found with id: " + id));
 
         validateAndApplySelfUpdate(existing, request);
 
@@ -94,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> updateByAdmin(Long id, UserDTO request) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("id", "User not found"));
+                .orElseThrow(() -> new UserNotFoundException("id", "User not found with id: " + id));
 
         validateAndApplyAdminUpdate(existing, request);
 
@@ -121,7 +125,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByNickname(nickname);
     }
 
-    public void prepareUserForCreation(User user) {
+    public void validateAndSetupUser(User user, String requestedRoleName) {
         List<ErrorResponse> errors = new ArrayList<>();
 
         if (existsByEmail(user.getEmail())) {
@@ -131,13 +135,20 @@ public class UserServiceImpl implements UserService {
             errors.add(new ErrorResponse("nickname", "Nickname already exists"));
         }
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        String roleName = (requestedRoleName != null && !requestedRoleName.isBlank())
+                ? requestedRoleName 
+                : "USER";
+
+        roleRepository.findByName(roleName)
+                .ifPresentOrElse(
+                        user::setRole,
+                        () -> errors.add(new ErrorResponse("roleName", "Role not found with name: " + roleName))
+                );
+
         if (!errors.isEmpty()) {
             throw new UserValidationException(errors);
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRole() == null) {
-            user.setRole(Role.USER);
         }
     }
 
@@ -160,9 +171,15 @@ public class UserServiceImpl implements UserService {
 
         applyCommonFields(existing, request.name(), request.email(), request.nickname(), errors);
 
-        if (request.role() != null) {
-            existing.setRole(request.role());
-        }
+        Optional.ofNullable(request.roleName())
+                .ifPresent(roleName -> {
+                    roleRepository.findByName(roleName)
+                            .ifPresentOrElse(
+                                    existing::setRole,
+                                    () -> errors.add(new ErrorResponse(
+                                            "roleName", "Role not found with name: " + roleName))
+                            );
+                });
 
         if (!errors.isEmpty()) {
             throw new UserValidationException(errors);

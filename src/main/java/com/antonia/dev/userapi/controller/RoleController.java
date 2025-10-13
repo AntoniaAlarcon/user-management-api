@@ -1,35 +1,76 @@
 package com.antonia.dev.userapi.controller;
 
+import com.antonia.dev.userapi.dto.DeleteResponse;
 import com.antonia.dev.userapi.dto.RoleDTO;
-import com.antonia.dev.userapi.entity.Role;
+import com.antonia.dev.userapi.service.RoleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/roles")
+@RequiredArgsConstructor
 public class RoleController {
+    private final RoleService roleService;
+
     @GetMapping
     public ResponseEntity<List<RoleDTO>> getAllRoles() {
-        return ResponseEntity.ok(
-                Arrays.stream(Role.values())
-                        .map(role -> new RoleDTO(role.name(), role.getDescription()))
-                        .toList()
-        );
+        return Optional.ofNullable(roleService.getAllRoles())
+                .filter(list -> !list.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<RoleDTO> getRoleByName(@PathVariable String name) {
-        return Arrays.stream(Role.values())
-                .filter(role -> role.name().equalsIgnoreCase(name))
-                .map(role -> new RoleDTO(role.name(), role.getDescription()))
-                .findFirst()
+    @GetMapping("name/{roleName}")
+    public ResponseEntity<RoleDTO> getRoleByName(@PathVariable String roleName) {
+        return roleService.getRoleByName(roleName)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("id/{id}")
+    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Long id) {
+        return roleService.getRoleById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<RoleDTO> createRole(@RequestBody RoleDTO roleDTO) {
+        return ResponseEntity.ok(roleService.createRole(roleDTO));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<RoleDTO> updateRole(@PathVariable Long id, @RequestBody RoleDTO roleDTO) {
+        return roleService.updateRole(id, roleDTO)
+                .map(updateRole -> {
+                    URI location = ServletUriComponentsBuilder
+                            .fromCurrentRequestUri()
+                            .buildAndExpand(updateRole.id())
+                            .toUri();
+                    return ResponseEntity.ok()
+                            .location(location)
+                            .body(updateRole);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<DeleteResponse> deleteRole(@PathVariable Long id) {
+        return roleService.deleteRole(id)
+                .map(role -> {
+                    DeleteResponse response = new DeleteResponse(
+                            "Role deleted successfully",
+                            role.getId(),
+                            role.getName()
+                    );
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

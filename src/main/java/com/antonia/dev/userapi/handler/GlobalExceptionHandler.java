@@ -1,6 +1,7 @@
 package com.antonia.dev.userapi.handler;
 
 import com.antonia.dev.userapi.dto.ErrorResponse;
+import com.antonia.dev.userapi.exception.RoleNotFoundException;
 import com.antonia.dev.userapi.exception.UserNotFoundException;
 import com.antonia.dev.userapi.exception.UserValidationException;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,12 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(field, message);
         return ResponseEntity.badRequest().body(Map.of("errors", List.of(error)));
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<Map<String, List<ErrorResponse>>> handleRoleNotFound(RoleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("errors", List.of(ex.toErrorResponse())));
     }
 
 
