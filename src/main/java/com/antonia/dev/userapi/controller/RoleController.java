@@ -42,21 +42,20 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<RoleDTO> createRole(@RequestBody RoleDTO roleDTO) {
-        return ResponseEntity.ok(roleService.createRole(roleDTO));
+        RoleDTO createdRole = roleService.createRole(roleDTO);
+        
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdRole.id())
+                .toUri();
+        
+        return ResponseEntity.created(location).body(createdRole);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<RoleDTO> updateRole(@PathVariable Long id, @RequestBody RoleDTO roleDTO) {
         return roleService.updateRole(id, roleDTO)
-                .map(updateRole -> {
-                    URI location = ServletUriComponentsBuilder
-                            .fromCurrentRequestUri()
-                            .buildAndExpand(updateRole.id())
-                            .toUri();
-                    return ResponseEntity.ok()
-                            .location(location)
-                            .body(updateRole);
-                })
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

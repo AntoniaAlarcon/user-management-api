@@ -14,6 +14,7 @@ import com.antonia.dev.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO createUser(CreateUserRequest request) {
         User user = userMapper.toEntity(request);
         validateAndSetupUser(user, request.roleName());
@@ -85,6 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Optional<UserDTO> updateSelf(Long id, UserUpdateSelfRequest request) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("id", "User not found with id: " + id));
@@ -96,6 +99,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Optional<UserDTO> updateByAdmin(Long id, UserDTO request) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("id", "User not found with id: " + id));
@@ -107,6 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Optional<User> delete(Long id) {
         return userRepository.findById(id)
                 .map(user -> {
@@ -125,7 +130,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByNickname(nickname);
     }
 
-    public void validateAndSetupUser(User user, String requestedRoleName) {
+    private void validateAndSetupUser(User user, String requestedRoleName) {
         List<ErrorResponse> errors = new ArrayList<>();
 
         if (existsByEmail(user.getEmail())) {

@@ -38,7 +38,10 @@ public class UserController {
 
     @GetMapping("/name/{name}")
     public ResponseEntity<List<UserDTO>> getUsersByName(@PathVariable String name) {
-        return ResponseEntity.ok(userService.getUsersByName(name));
+        List<UserDTO> users = userService.getUsersByName(name);
+        return users.isEmpty() 
+                ? ResponseEntity.noContent().build() 
+                : ResponseEntity.ok(users);
     }
 
     @GetMapping("/email/{email}")
@@ -57,7 +60,10 @@ public class UserController {
 
     @GetMapping("/role/{roleName}")
     public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable String roleName) {
-        return ResponseEntity.ok(userService.getUsersByRole(roleName));
+        List<UserDTO> users = userService.getUsersByRole(roleName);
+        return users.isEmpty() 
+                ? ResponseEntity.noContent().build() 
+                : ResponseEntity.ok(users);
     }
 
     @PostMapping
@@ -75,15 +81,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         return userService.updateByAdmin(id, userDTO)
-                .map(updatedUser -> {
-                    URI location = ServletUriComponentsBuilder
-                            .fromCurrentRequestUri()
-                            .buildAndExpand(updatedUser.id())
-                            .toUri();
-                    return ResponseEntity.ok()
-                            .location(location)
-                            .body(updatedUser);
-                })
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -91,26 +89,18 @@ public class UserController {
     @PatchMapping("/self/{id}")
     public ResponseEntity<UserDTO> updateSelf(@PathVariable Long id, @Valid @RequestBody UserUpdateSelfRequest user) {
         return userService.updateSelf(id, user)
-                .map(updatedUser -> {
-                    URI location = ServletUriComponentsBuilder
-                            .fromCurrentRequestUri()
-                            .buildAndExpand(updatedUser.id())
-                            .toUri();
-                    return ResponseEntity.ok()
-                            .location(location)
-                            .body(updatedUser);
-                })
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<DeleteResponse> deleteUser(@PathVariable Long id) {
         return userService.delete(id)
-                .map(role -> {
+                .map(user -> {
                     DeleteResponse response = new DeleteResponse(
-                            "Role deleted successfully",
-                            role.getId(),
-                            role.getName()
+                            "User deleted successfully",
+                            user.getId(),
+                            user.getName()
                     );
                     return ResponseEntity.ok(response);
                 })

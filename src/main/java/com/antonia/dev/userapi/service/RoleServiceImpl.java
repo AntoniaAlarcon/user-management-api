@@ -7,6 +7,7 @@ import com.antonia.dev.userapi.mapper.RoleMapper;
 import com.antonia.dev.userapi.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,12 +40,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public RoleDTO createRole(RoleDTO roleDTO) {
         Role role = roleMapper.toEntity(roleDTO);
         return roleMapper.toDTO(roleRepository.save(role));
     }
 
     @Override
+    @Transactional
     public Optional<RoleDTO> updateRole(Long id, RoleDTO roleDTO) {
         Role existing = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("id", "Role not found with ID: " + id));
@@ -61,6 +64,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public Optional<Role> deleteRole(Long id) {
         return roleRepository.findById(id)
                 .map(role -> {
