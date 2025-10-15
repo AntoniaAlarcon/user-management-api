@@ -18,7 +18,7 @@ public class User {
     private Long id;
 
     private String name;
-    private String nickname;
+    private String username;
     private String email;
     private String password;
 
@@ -30,9 +30,9 @@ public class User {
     @Embedded
     private Audit audit = new Audit();
 
-    public User(String name, String nickname, String email, String password, Role role) {
+    public User(String name, String username, String email, String password, Role role) {
         this.name = name;
-        this.nickname = nickname;
+        this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;

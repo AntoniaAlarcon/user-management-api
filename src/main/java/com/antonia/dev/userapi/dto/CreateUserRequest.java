@@ -6,8 +6,8 @@ public record CreateUserRequest(
     @NotBlank(message = "{user.name.required}")
     String name,
 
-    @NotBlank(message = "{user.nickname.required}")
-    String nickname,
+    @NotBlank(message = "{user.username.required}")
+    String username,
 
     @NotBlank(message = "{user.email.required}")
     @Email(message = "{user.email.invalid}")

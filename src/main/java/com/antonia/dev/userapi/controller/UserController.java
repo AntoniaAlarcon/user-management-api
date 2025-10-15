@@ -51,9 +51,9 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/nickname/{nickname}")
-    public ResponseEntity<UserDTO> getUserByNickname(@PathVariable String nickname) {
-        return userService.getUserByNickname(nickname)
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        return userService.getUserByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

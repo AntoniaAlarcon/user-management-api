@@ -82,18 +82,18 @@ The API will be available at `http://localhost:8080/api`
 
 ### Users
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/users` | Get all users |
-| GET | `/api/users/{id}` | Get user by ID |
-| GET | `/api/users/email/{email}` | Get user by email |
-| GET | `/api/users/nickname/{nickname}` | Get user by nickname |
-| GET | `/api/users/name/{name}` | Get users by name |
-| GET | `/api/users/role/{roleName}` | Get users by role |
-| POST | `/api/users` | Create a new user |
-| PATCH | `/api/users/{id}` | Update user (admin) |
-| PATCH | `/api/users/self/{id}` | Update own profile |
-| DELETE | `/api/users/{id}` | Delete user |
+| Method | Endpoint                         | Description          |
+|--------|----------------------------------|----------------------|
+| GET | `/api/users`                     | Get all users        |
+| GET | `/api/users/{id}`                | Get user by ID       |
+| GET | `/api/users/email/{email}`       | Get user by email    |
+| GET | `/api/users/username/{username}` | Get user by username |
+| GET | `/api/users/name/{name}`         | Get users by name    |
+| GET | `/api/users/role/{roleName}`     | Get users by role    |
+| POST | `/api/users`                     | Create a new user    |
+| PATCH | `/api/users/{id}`                | Update user (admin)  |
+| PATCH | `/api/users/self/{id}`           | Update own profile   |
+| DELETE | `/api/users/{id}`                | Delete user          |
 
 ### Roles
 
@@ -116,7 +116,7 @@ Content-Type: application/json
 
 {
   "name": "John Doe",
-  "nickname": "johndoe",
+  "username": "johndoe",
   "email": "john@example.com",
   "password": "securepass123",
   "roleName": "USER"
@@ -128,7 +128,7 @@ Content-Type: application/json
 {
   "id": 1,
   "name": "John Doe",
-  "nickname": "johndoe",
+  "username": "johndoe",
   "email": "john@example.com",
   "roleName": "USER"
 }
@@ -153,7 +153,7 @@ Content-Type: application/json
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    nickname VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role_id BIGINT NOT NULL,
@@ -253,7 +253,7 @@ Automatic DTO-Entity mapping with custom configurations:
 ### Validation
 - Bean Validation (Jakarta Validation)
 - Custom validation in service layer
-- Unique email and nickname constraints
+- Unique email and username constraints
 
 ### Exception Handling
 - Global exception handler for consistent error responses

@@ -51,10 +51,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserDTO> getUserByNickname(String nickname) {
-        return Optional.ofNullable(userRepository.findByNickname(nickname)
+    public Optional<UserDTO> getUserByUsername(String username) {
+        return Optional.ofNullable(userRepository.findByUsername(username)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new UserNotFoundException("nickname", "User not found with nickname: " + nickname)));
+                .orElseThrow(() -> new UserNotFoundException("username", "User not found with username: " + username)));
     }
 
     @Override
@@ -126,8 +126,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsByNickname(String nickname) {
-        return userRepository.existsByNickname(nickname);
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     private void validateAndSetupUser(User user, String requestedRoleName) {
@@ -136,8 +136,8 @@ public class UserServiceImpl implements UserService {
         if (existsByEmail(user.getEmail())) {
             errors.add(new ErrorResponse("email", "Email already exists"));
         }
-        if (existsByNickname(user.getNickname())) {
-            errors.add(new ErrorResponse("nickname", "Nickname already exists"));
+        if (existsByUsername(user.getUsername())) {
+            errors.add(new ErrorResponse("username", "Username already exists"));
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
     private void validateAndApplySelfUpdate(User existing, UserUpdateSelfRequest request) {
         List<ErrorResponse> errors = new ArrayList<>();
 
-        applyCommonFields(existing, request.name(), request.email(), request.nickname(), errors);
+        applyCommonFields(existing, request.name(), request.email(), request.username(), errors);
 
         if (request.password() != null && !request.password().isBlank()) {
             existing.setPassword(passwordEncoder.encode(request.password()));
@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
     private void validateAndApplyAdminUpdate(User existing, UserDTO request) {
         List<ErrorResponse> errors = new ArrayList<>();
 
-        applyCommonFields(existing, request.name(), request.email(), request.nickname(), errors);
+        applyCommonFields(existing, request.name(), request.email(), request.username(), errors);
 
         Optional.ofNullable(request.roleName())
                 .ifPresent(roleName -> {
@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void applyCommonFields(User existing, String name, String email, String nickname, List<ErrorResponse> errors) {
+    private void applyCommonFields(User existing, String name, String email, String username, List<ErrorResponse> errors) {
         if (name != null && !name.isBlank()) {
             existing.setName(name);
         }
@@ -204,11 +204,11 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        if (nickname != null && !nickname.isBlank()) {
-            if (!nickname.equals(existing.getNickname()) && userRepository.existsByNickname(nickname)) {
-                errors.add(new ErrorResponse("nickname", "Nickname already exists"));
+        if (username != null && !username.isBlank()) {
+            if (!username.equals(existing.getUsername()) && userRepository.existsByUsername(username)) {
+                errors.add(new ErrorResponse("username", "Username already exists"));
             } else {
-                existing.setNickname(nickname);
+                existing.setUsername(username);
             }
         }
     }

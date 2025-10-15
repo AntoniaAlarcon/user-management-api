@@ -3,7 +3,6 @@ package com.antonia.dev.userapi.service;
 import com.antonia.dev.userapi.dto.CreateUserRequest;
 import com.antonia.dev.userapi.dto.UserDTO;
 import com.antonia.dev.userapi.dto.UserUpdateSelfRequest;
-import com.antonia.dev.userapi.entity.Role;
 import com.antonia.dev.userapi.entity.User;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public interface UserService {
 
     Optional<UserDTO> getUserById(Long id);
     Optional<UserDTO> getUserByEmail(String email);
-    Optional<UserDTO> getUserByNickname(String nickname);
+    Optional<UserDTO> getUserByUsername(String username);
 
     List<UserDTO> getUsersByName(String name);
     List<UserDTO> getUsersByRole(String roleName);
@@ -26,5 +25,5 @@ public interface UserService {
     Optional<User> delete(Long id);
 
     boolean existsByEmail(String email);
-    boolean existsByNickname(String nickname);
+    boolean existsByUsername(String username);
 }
