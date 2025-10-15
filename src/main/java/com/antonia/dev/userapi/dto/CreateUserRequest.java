@@ -1,22 +1,21 @@
 package com.antonia.dev.userapi.dto;
 
-import com.antonia.dev.userapi.entity.Role;
 import jakarta.validation.constraints.*;
 
 public record CreateUserRequest(
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "{user.name.required}")
     String name,
-    
-    @NotBlank(message = "Nickname is required")
+
+    @NotBlank(message = "{user.nickname.required}")
     String nickname,
-    
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email format is invalid")
+
+    @NotBlank(message = "{user.email.required}")
+    @Email(message = "{user.email.invalid}")
     String email,
-    
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
+
+    @NotBlank(message = "{user.password.required}")
+    @Size(min = 6, message = "{user.password.size}")
     String password,
-    
+
     String roleName
 ) {}
