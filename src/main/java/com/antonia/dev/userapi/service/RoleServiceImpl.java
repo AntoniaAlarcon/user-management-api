@@ -19,6 +19,7 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMapper roleMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<RoleDTO> getAllRoles() {
         return roleRepository.findAll().stream()
                 .map(roleMapper::toDTO)
@@ -26,6 +27,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<RoleDTO> getRoleById(Long id) {
         return Optional.ofNullable(roleRepository.findById(id)
                 .map(roleMapper::toDTO)
@@ -33,6 +35,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<RoleDTO> getRoleByName(String roleName) {
         return Optional.ofNullable(roleRepository.findByName(roleName)
                 .map(roleMapper::toDTO)

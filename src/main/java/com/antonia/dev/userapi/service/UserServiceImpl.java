@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UserDTO> getUserById(Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(userMapper::toDTO)
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UserDTO> getUserByEmail(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email)
                 .map(userMapper::toDTO)
@@ -51,6 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UserDTO> getUserByUsername(String username) {
         return Optional.ofNullable(userRepository.findByUsername(username)
                 .map(userMapper::toDTO)
@@ -58,6 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByName(String name) {
         return userRepository.findByName(name)
                 .stream()
@@ -66,6 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByRole(String roleName) {
         roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RoleNotFoundException("roleName", "Role not found with name: " + roleName));
