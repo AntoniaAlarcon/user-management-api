@@ -14,5 +14,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "audit", ignore = true)
+    @Mapping(target = "admin", ignore = true)
     User toEntity(CreateUserRequest request);
 }

@@ -34,6 +34,9 @@ public class User {
     @Embedded
     private Audit audit = new Audit();
 
+    @Transient
+    private boolean admin;
+
     public User(String name, String username, String email, String password, Role role) {
         this.name = name;
         this.username = username;
