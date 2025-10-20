@@ -1,27 +1,31 @@
 # User Management API
 
-A robust REST API built with Spring Boot for user registration, authentication, and role-based access control.
+A robust REST API built with Spring Boot for user registration, JWT authentication, and role-based access control.
 
 ## 📋 Table of Contents
 
 - [Features](#-features)
 - [Tech Stack](#️-tech-stack)
 - [Getting Started](#-getting-started)
+- [JWT Authentication](#-jwt-authentication)
 - [API Endpoints](#-api-endpoints)
 - [Database Schema](#️-database-schema)
 - [Configuration](#️-configuration)
 - [Project Structure](#-project-structure)
+- [Additional Documentation](#-additional-documentation)
 
 ## ✨ Features
 
-- **User Management**: CRUD operations for users with validation
+- **JWT Authentication**: Complete token-based authentication system
 - **Role-Based Access Control**: Manage user roles (ADMIN, USER, MANAGER)
+- **User Management**: CRUD operations with complete validation
 - **Data Validation**: Input validation with custom error responses
 - **Entity Auditing**: Automatic tracking of creation and modification timestamps
 - **Password Encryption**: Secure password storage using BCrypt
 - **MapStruct Integration**: Efficient DTO-Entity mapping
 - **Database Seeding**: Auto-populate database with sample data in dev profile
 - **Global Exception Handling**: Centralized error handling with meaningful responses
+- **Stateless Sessions**: JWT enables scalability without server-side sessions
 
 ## 🛠️ Tech Stack
 
@@ -32,6 +36,7 @@ A robust REST API built with Spring Boot for user registration, authentication, 
   - Spring Validation
   - Spring Web
 - **MySQL** / PostgreSQL
+- **JWT (JSON Web Tokens)** - JJWT 0.12.6
 - **Lombok** - Reduce boilerplate code
 - **MapStruct** - Object mapping
 - **Maven** - Dependency management
@@ -78,38 +83,91 @@ A robust REST API built with Spring Boot for user registration, authentication, 
 
 The API will be available at `http://localhost:8080/api`
 
+## 🔐 JWT Authentication
+
+### Authentication Flow
+
+1. **Login**: User sends credentials to `/api/auth/login`
+2. **Token**: Server generates a JWT containing username and role
+3. **Token Usage**: Client includes token in `Authorization: Bearer <token>` header for subsequent requests
+4. **Validation**: Server validates token automatically on each request
+
+### Login Example
+
+**Request:**
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "type": "Bearer",
+  "username": "admin",
+  "email": "admin@example.com",
+  "role": "ADMIN",
+  "userId": 1
+}
+```
+
+### Using the Token
+
+```bash
+GET /api/users
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
+```
+
+The token contains:
+- Username
+- User role
+- Issue date
+- Expiration date (24 hours by default)
+
 ## 📡 API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| POST | `/api/auth/login` | Login | Public |
+| GET | `/api/auth/validate` | Validate token | Requires token |
 
 ### Users
 
-| Method | Endpoint                         | Description          |
-|--------|----------------------------------|----------------------|
-| GET | `/api/users`                     | Get all users        |
-| GET | `/api/users/{id}`                | Get user by ID       |
-| GET | `/api/users/email/{email}`       | Get user by email    |
-| GET | `/api/users/username/{username}` | Get user by username |
-| GET | `/api/users/name/{name}`         | Get users by name    |
-| GET | `/api/users/role/{roleName}`     | Get users by role    |
-| POST | `/api/users`                     | Create a new user    |
-| PATCH | `/api/users/{id}`                | Update user (admin)  |
-| PATCH | `/api/users/self/{id}`           | Update own profile   |
-| DELETE | `/api/users/{id}`                | Delete user          |
+| Method | Endpoint | Description | Required Role |
+|--------|----------|-------------|---------------|
+| POST | `/api/users` | Create user (registration) | Public |
+| GET | `/api/users` | List all users | ADMIN |
+| GET | `/api/users/{id}` | Get user by ID | Authenticated |
+| GET | `/api/users/email/{email}` | Find by email | Authenticated |
+| GET | `/api/users/username/{username}` | Find by username | Authenticated |
+| GET | `/api/users/name/{name}` | Find by name | Authenticated |
+| GET | `/api/users/role/{roleName}` | Find by role | Authenticated |
+| PUT | `/api/users/{id}` | Update user | ADMIN |
+| PATCH | `/api/users/self/{id}` | Update own profile | Authenticated |
+| DELETE | `/api/users/{id}` | Delete user | ADMIN |
 
 ### Roles
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/roles` | Get all roles |
-| GET | `/api/roles/{idOrName}` | Get role by ID or name |
-| GET | `/api/roles/name/{roleName}` | Get role by name |
-| GET | `/api/roles/id/{id}` | Get role by ID |
-| POST | `/api/roles` | Create a new role |
-| PATCH | `/api/roles/{id}` | Update role |
-| DELETE | `/api/roles/{id}` | Delete role |
+| Method | Endpoint | Description | Required Role |
+|--------|----------|-------------|---------------|
+| GET | `/api/roles` | List all roles | ADMIN |
+| GET | `/api/roles/{idOrName}` | Get role by ID or name | ADMIN |
+| GET | `/api/roles/name/{roleName}` | Get role by name | ADMIN |
+| GET | `/api/roles/id/{id}` | Get role by ID | ADMIN |
+| POST | `/api/roles` | Create new role | ADMIN |
+| PATCH | `/api/roles/{id}` | Update role | ADMIN |
+| DELETE | `/api/roles/{id}` | Delete role | ADMIN |
 
-### Request/Response Examples
+### User Registration Example
 
-#### Create User
 ```bash
 POST /api/users
 Content-Type: application/json
@@ -119,7 +177,7 @@ Content-Type: application/json
   "username": "johndoe",
   "email": "john@example.com",
   "password": "securepass123",
-  "roleName": "USER"
+  "roleId": 2
 }
 ```
 
@@ -134,7 +192,8 @@ Content-Type: application/json
 }
 ```
 
-#### Error Response
+### Error Response
+
 ```json
 {
   "errors": [
@@ -192,22 +251,43 @@ When running in `dev` profile, the database is automatically seeded with:
 - 3 default roles: ADMIN, USER, MANAGER
 - 10 sample users with different roles
 
-### Security Configuration
+**Test users:**
+- Username: `admin` / Password: `admin123` (Role: ADMIN)
+- Username: `user1` / Password: `password1` (Role: USER)
+- Username: `manager1` / Password: `password1` (Role: MANAGER)
 
-Currently configured with:
-- CSRF disabled
-- All endpoints permit all (configure as needed for production)
+### JWT Configuration
 
-**⚠️ Note**: Update `SecurityConfig.java` for production deployment.
+```properties
+jwt.secret=<your-secret-key>
+jwt.expiration=86400000  # 24 hours in milliseconds
+```
+
+**⚠️ IMPORTANT**: For production:
+- Generate a secure secret key (minimum 512 bits)
+- Use environment variables instead of hardcoding the secret
+
+### Security
+
+Role-based access control configuration:
+- `/api/auth/**` - Public (no authentication)
+- `/api/users` POST - Public (registration)
+- `/api/users` GET, PUT, DELETE - ADMIN only
+- `/api/roles/**` - ADMIN only
+- Other endpoints - Authenticated user
 
 ## 📁 Project Structure
 
 ```
 src/main/java/com/antonia/dev/userapi/
 ├── controller/          # REST controllers
+│   ├── AuthController.java
 │   ├── UserController.java
 │   └── RoleController.java
 ├── dto/                 # Data Transfer Objects
+│   ├── LoginRequest.java
+│   ├── LoginResponse.java
+│   ├── ValidationResponse.java
 │   ├── UserDTO.java
 │   ├── RoleDTO.java
 │   ├── CreateUserRequest.java
@@ -230,32 +310,49 @@ src/main/java/com/antonia/dev/userapi/
 ├── repository/          # Data access layer
 │   ├── UserRepository.java
 │   └── RoleRepository.java
+├── security/            # Security and JWT
+│   ├── JwtUtil.java
+│   ├── JwtAuthenticationFilter.java
+│   ├── CustomUserDetailsService.java
+│   └── SecurityConfig.java
 ├── service/             # Business logic
 │   ├── UserService.java
 │   ├── UserServiceImpl.java
 │   ├── RoleService.java
 │   └── RoleServiceImpl.java
-├── DatabaseSeeder.java  # Database initialization
-└── SecurityConfig.java  # Security configuration
+├── AppConfig.java       # Application configuration
+├── DatabaseSeeder.java  # Data initialization
+└── UserManagementApiApplication.java
 ```
 
 ## 🔍 Key Features Explained
 
+### JWT Integration
+
+- **JwtUtil**: Generates and validates JWT tokens with role included
+- **JwtAuthenticationFilter**: Intercepts requests and validates tokens automatically
+- **CustomUserDetailsService**: Loads users from database for Spring Security
+- **Stateless Tokens**: No server-side state stored, fully scalable
+
 ### MapStruct Integration
+
 Automatic DTO-Entity mapping with custom configurations:
 - User to UserDTO with role name extraction
 - Efficient mapping without boilerplate code
 
 ### Query Optimization
+
 - Uses `JOIN FETCH` to prevent N+1 query problems
 - Custom JPQL queries for complex operations
 
 ### Validation
+
 - Bean Validation (Jakarta Validation)
 - Custom validation in service layer
 - Unique email and username constraints
 
 ### Exception Handling
+
 - Global exception handler for consistent error responses
 - Custom exceptions for domain-specific errors
 - Field-level error reporting
@@ -263,26 +360,84 @@ Automatic DTO-Entity mapping with custom configurations:
 ## 🔐 Security Notes
 
 **Current Configuration (Development)**:
-- Basic Spring Security enabled
-- All endpoints are publicly accessible
+- Spring Security enabled
+- JWT authentication fully functional
+- Role-based authorization
 - Passwords encrypted with BCrypt
+- Tokens with 24-hour expiration
 
 **Production Recommendations**:
-- Implement JWT authentication
-- Add role-based authorization
+- Generate secure JWT secret (use `openssl rand -base64 64`)
+- Use environment variables for secrets
 - Enable HTTPS
 - Configure CORS properly
 - Add rate limiting
+- Implement token rotation
+- Use secret managers (AWS Secrets Manager, Azure Key Vault, etc.)
 
-## 📝 License
+## 📝 HTTP Status Codes
 
-This project is available for educational and portfolio purposes.
+| Code | Meaning | When it occurs |
+|------|---------|----------------|
+| 200 | OK | Successful request |
+| 201 | Created | Resource created successfully |
+| 400 | Bad Request | Invalid input data |
+| 401 | Unauthorized | Invalid or expired token |
+| 403 | Forbidden | No permissions for resource |
+| 404 | Not Found | Resource not found |
+| 500 | Internal Server Error | Server error |
+
+## 🧪 Testing
+
+### Basic Scenario
+
+```bash
+# 1. Register user
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "test123",
+    "roleId": 2
+  }'
+
+# 2. Login
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "test123"
+  }'
+
+# 3. Use received token in requests
+curl -X GET http://localhost:8080/api/users/1 \
+  -H "Authorization: Bearer <TOKEN_HERE>"
+```
+
+## 📊 Project Features
+
+- ✅ Complete RESTful API
+- ✅ JWT Authentication
+- ✅ Role-based Authorization
+- ✅ Full CRUD for users and roles
+- ✅ Data validation
+- ✅ Global error handling
+- ✅ Entity auditing
+- ✅ Database seeding for development
+- ✅ BCrypt encrypted passwords
+- ✅ Stateless sessions
+- ✅ Layered architecture (Controller → Service → Repository)
 
 ## 👤 Author
 
 **Antonia**
 
+## 📜 License
+
+This project is available for educational and portfolio purposes.
+
 ---
 
 **Note**: This is a portfolio project. For production use, additional security measures and configurations are required.
-
