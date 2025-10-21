@@ -1,4 +1,4 @@
-package com.antonia.dev.userapi.dto;
+package com.antonia.dev.userapi.dto.auth;
 
 public record ValidationResponse(
         boolean valid,

@@ -1,6 +1,6 @@
 package com.antonia.dev.userapi.handler;
 
-import com.antonia.dev.userapi.dto.ErrorResponse;
+import com.antonia.dev.userapi.dto.common.ErrorResponse;
 import com.antonia.dev.userapi.exception.RoleNotFoundException;
 import com.antonia.dev.userapi.exception.UserNotFoundException;
 import com.antonia.dev.userapi.exception.UserValidationException;

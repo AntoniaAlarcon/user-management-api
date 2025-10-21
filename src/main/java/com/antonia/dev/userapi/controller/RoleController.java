@@ -1,8 +1,8 @@
 package com.antonia.dev.userapi.controller;
 
-import com.antonia.dev.userapi.dto.DeleteResponse;
-import com.antonia.dev.userapi.dto.RoleDTO;
-import com.antonia.dev.userapi.service.RoleService;
+import com.antonia.dev.userapi.dto.common.DeleteResponse;
+import com.antonia.dev.userapi.dto.role.RoleDTO;
+import com.antonia.dev.userapi.service.role.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

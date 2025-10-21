@@ -1,4 +1,4 @@
-package com.antonia.dev.userapi.dto;
+package com.antonia.dev.userapi.dto.common;
 
 public record ErrorResponse(
     String field,

@@ -1,7 +1,7 @@
 package com.antonia.dev.userapi.mapper;
 
-import com.antonia.dev.userapi.dto.CreateUserRequest;
-import com.antonia.dev.userapi.dto.UserDTO;
+import com.antonia.dev.userapi.dto.user.CreateUserRequest;
+import com.antonia.dev.userapi.dto.user.UserDTO;
 import com.antonia.dev.userapi.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,8 +1,8 @@
-package com.antonia.dev.userapi.service;
+package com.antonia.dev.userapi.service.user;
 
-import com.antonia.dev.userapi.dto.CreateUserRequest;
-import com.antonia.dev.userapi.dto.UserDTO;
-import com.antonia.dev.userapi.dto.UserUpdateSelfRequest;
+import com.antonia.dev.userapi.dto.user.CreateUserRequest;
+import com.antonia.dev.userapi.dto.user.UserDTO;
+import com.antonia.dev.userapi.dto.user.UserUpdateSelfRequest;
 import com.antonia.dev.userapi.entity.User;
 
 import java.util.List;

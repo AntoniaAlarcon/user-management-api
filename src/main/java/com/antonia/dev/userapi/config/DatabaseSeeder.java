@@ -1,4 +1,4 @@
-package com.antonia.dev.userapi;
+package com.antonia.dev.userapi.config;
 
 import com.antonia.dev.userapi.entity.Role;
 import com.antonia.dev.userapi.entity.User;

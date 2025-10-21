@@ -1,4 +1,4 @@
-package com.antonia.dev.userapi.dto;
+package com.antonia.dev.userapi.dto.user;
 
 public record UserDTO(
     Long id,

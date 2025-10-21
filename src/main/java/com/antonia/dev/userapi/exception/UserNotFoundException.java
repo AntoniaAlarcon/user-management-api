@@ -1,6 +1,6 @@
 package com.antonia.dev.userapi.exception;
 
-import com.antonia.dev.userapi.dto.ErrorResponse;
+import com.antonia.dev.userapi.dto.common.ErrorResponse;
 import lombok.Getter;
 
 @Getter

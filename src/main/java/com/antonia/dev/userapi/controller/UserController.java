@@ -1,10 +1,10 @@
 package com.antonia.dev.userapi.controller;
 
-import com.antonia.dev.userapi.dto.CreateUserRequest;
-import com.antonia.dev.userapi.dto.DeleteResponse;
-import com.antonia.dev.userapi.dto.UserDTO;
-import com.antonia.dev.userapi.dto.UserUpdateSelfRequest;
-import com.antonia.dev.userapi.service.UserService;
+import com.antonia.dev.userapi.dto.user.CreateUserRequest;
+import com.antonia.dev.userapi.dto.common.DeleteResponse;
+import com.antonia.dev.userapi.dto.user.UserDTO;
+import com.antonia.dev.userapi.dto.user.UserUpdateSelfRequest;
+import com.antonia.dev.userapi.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

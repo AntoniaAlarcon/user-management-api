@@ -1,8 +1,8 @@
 package com.antonia.dev.userapi.controller;
 
-import com.antonia.dev.userapi.dto.LoginRequest;
-import com.antonia.dev.userapi.dto.LoginResponse;
-import com.antonia.dev.userapi.dto.ValidationResponse;
+import com.antonia.dev.userapi.dto.auth.LoginRequest;
+import com.antonia.dev.userapi.dto.auth.LoginResponse;
+import com.antonia.dev.userapi.dto.auth.ValidationResponse;
 import com.antonia.dev.userapi.entity.User;
 import com.antonia.dev.userapi.security.CustomUserDetailsService;
 import com.antonia.dev.userapi.security.JwtUtil;

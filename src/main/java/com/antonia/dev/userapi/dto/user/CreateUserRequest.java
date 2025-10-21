@@ -1,4 +1,4 @@
-package com.antonia.dev.userapi.dto;
+package com.antonia.dev.userapi.dto.user;
 
 import jakarta.validation.constraints.*;
 

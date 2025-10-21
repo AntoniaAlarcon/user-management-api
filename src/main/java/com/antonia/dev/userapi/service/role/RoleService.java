@@ -1,6 +1,6 @@
-package com.antonia.dev.userapi.service;
+package com.antonia.dev.userapi.service.role;
 
-import com.antonia.dev.userapi.dto.RoleDTO;
+import com.antonia.dev.userapi.dto.role.RoleDTO;
 import com.antonia.dev.userapi.entity.Role;
 
 import java.util.List;
