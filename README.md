@@ -280,20 +280,27 @@ Role-based access control configuration:
 
 ```
 src/main/java/com/antonia/dev/userapi/
+├── config/              # Application configuration
+│   ├── AppConfig.java
+│   └── DatabaseSeeder.java
 ├── controller/          # REST controllers
 │   ├── AuthController.java
 │   ├── UserController.java
 │   └── RoleController.java
 ├── dto/                 # Data Transfer Objects
-│   ├── LoginRequest.java
-│   ├── LoginResponse.java
-│   ├── ValidationResponse.java
-│   ├── UserDTO.java
-│   ├── RoleDTO.java
-│   ├── CreateUserRequest.java
-│   ├── UserUpdateSelfRequest.java
-│   ├── DeleteResponse.java
-│   └── ErrorResponse.java
+│   ├── auth/
+│   │   ├── LoginRequest.java
+│   │   ├── LoginResponse.java
+│   │   └── ValidationResponse.java
+│   ├── common/
+│   │   ├── DeleteResponse.java
+│   │   └── ErrorResponse.java
+│   ├── role/
+│   │   └── RoleDTO.java
+│   └── user/
+│       ├── CreateUserRequest.java
+│       ├── UserDTO.java
+│       └── UserUpdateSelfRequest.java
 ├── entity/              # JPA entities
 │   ├── User.java
 │   ├── Role.java
@@ -316,12 +323,12 @@ src/main/java/com/antonia/dev/userapi/
 │   ├── CustomUserDetailsService.java
 │   └── SecurityConfig.java
 ├── service/             # Business logic
-│   ├── UserService.java
-│   ├── UserServiceImpl.java
-│   ├── RoleService.java
-│   └── RoleServiceImpl.java
-├── AppConfig.java       # Application configuration
-├── DatabaseSeeder.java  # Data initialization
+│   ├── role/
+│   │   ├── RoleService.java
+│   │   └── RoleServiceImpl.java
+│   └── user/
+│       ├── UserService.java
+│       └── UserServiceImpl.java
 └── UserManagementApiApplication.java
 ```
 
