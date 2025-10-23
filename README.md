@@ -12,6 +12,7 @@ A robust REST API built with Spring Boot for user registration, JWT authenticati
 - [Database Schema](#️-database-schema)
 - [Configuration](#️-configuration)
 - [Project Structure](#-project-structure)
+- [Key Features Explained](#-key-features-explained)
 - [Additional Documentation](#-additional-documentation)
 
 ## ✨ Features
@@ -26,6 +27,7 @@ A robust REST API built with Spring Boot for user registration, JWT authenticati
 - **Database Seeding**: Auto-populate database with sample data in dev profile
 - **Global Exception Handling**: Centralized error handling with meaningful responses
 - **Stateless Sessions**: JWT enables scalability without server-side sessions
+- **AOP Integration**: Aspect-Oriented Programming for logging, auditing, performance monitoring, and security tracking
 
 ## 🛠️ Tech Stack
 
@@ -35,10 +37,12 @@ A robust REST API built with Spring Boot for user registration, JWT authenticati
   - Spring Security
   - Spring Validation
   - Spring Web
+  - Spring AOP
 - **MySQL** / PostgreSQL
 - **JWT (JSON Web Tokens)** - JJWT 0.12.6
 - **Lombok** - Reduce boilerplate code
 - **MapStruct** - Object mapping
+- **AspectJ** - Aspect-Oriented Programming
 - **Maven** - Dependency management
 
 ## 🚀 Getting Started
@@ -280,6 +284,11 @@ Role-based access control configuration:
 
 ```
 src/main/java/com/antonia/dev/userapi/
+├── aspect/              # AOP aspects for cross-cutting concerns
+│   ├── LoggingAspect.java
+│   ├── AuditAspect.java
+│   ├── PerformanceAspect.java
+│   └── SecurityAuditAspect.java
 ├── config/              # Application configuration
 │   ├── AppConfig.java
 │   └── DatabaseSeeder.java
@@ -340,6 +349,42 @@ src/main/java/com/antonia/dev/userapi/
 - **JwtAuthenticationFilter**: Intercepts requests and validates tokens automatically
 - **CustomUserDetailsService**: Loads users from database for Spring Security
 - **Stateless Tokens**: No server-side state stored, fully scalable
+
+### AOP Integration
+
+Aspect-Oriented Programming for cross-cutting concerns without modifying business logic:
+
+#### LoggingAspect
+- Automatic logging of all service and controller method executions
+- Tracks method parameters, execution time, and results
+- Separate logging for different application layers
+
+#### AuditAspect
+- Complete audit trail for user operations (create, update, delete)
+- Complete audit trail for role operations (create, update, delete) - ADMIN only
+- Records who performed each operation and when
+- Tracks failed operations for security analysis
+- Includes user role in audit logs for role operations
+
+#### PerformanceAspect
+- Monitors execution time for all layers (repository, service, controller)
+- Detects slow queries (> 1 second) and services (> 2 seconds)
+- Automatic alerts for performance issues
+- Helps identify bottlenecks proactively
+
+#### SecurityAuditAspect
+- Tracks successful and failed login attempts
+- Records authentication failures with reasons (invalid credentials, account disabled, etc.)
+- Monitors token validation attempts
+- Audits password change attempts
+- Enables detection of brute force attacks
+
+**Benefits:**
+- Clean separation of concerns
+- No code duplication
+- Centralized logging and auditing
+- Easy to maintain and extend
+- Production-ready audit logs in `logs/userapi-audit.log`
 
 ### MapStruct Integration
 
@@ -436,10 +481,21 @@ curl -X GET http://localhost:8080/api/users/1 \
 - ✅ BCrypt encrypted passwords
 - ✅ Stateless sessions
 - ✅ Layered architecture (Controller → Service → Repository)
+- ✅ AOP for logging, auditing, and performance monitoring
+- ✅ Complete security audit trail
+- ✅ Automatic performance bottleneck detection
 
 ## 👤 Author
 
 **Antonia**
+
+## 📝 Additional Documentation
+
+For more detailed information, see:
+- [AOP Implementation Guide](AOP_IMPLEMENTATION.md) - Complete guide to Aspect-Oriented Programming implementation
+- [JWT Setup Guide](JWT_SETUP.md)
+- [API Testing Examples](API_TESTING_EXAMPLES.md)
+- [Production Configuration](PRODUCCION_CONFIG.md)
 
 ## 📜 License
 
