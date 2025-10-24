@@ -54,15 +54,16 @@ public class SecurityAuditAspect {
         }
     }
 
-    /**
-     * Audits token validation attempts
-     */
     @Before("execution(* com.antonia.dev.userapi.controller.AuthController.validateToken(..))")
     public void auditTokenValidation(JoinPoint joinPoint) {
         log.debug("SECURITY [TOKEN_VALIDATION] - Validation attempt at {}", 
                   LocalDateTime.now());
     }
 
+    // NOTE: This aspect is commented out because it causes issues with the initialization of the JWT filter.
+    // AOP tries to create a proxy for the filter, which interferes with the logger initialization.
+    // JWT filter errors are handled internally within the filter itself.
+    /*
     @AfterThrowing(
         pointcut = "execution(* com.antonia.dev.userapi.security.JwtAuthenticationFilter.doFilterInternal(..))",
         throwing = "exception"
@@ -72,11 +73,11 @@ public class SecurityAuditAspect {
                   exception.getMessage(),
                   LocalDateTime.now());
     }
+    */
 
     @AfterReturning("execution(* com.antonia.dev.userapi.service.user.UserService.updateSelf(..)) && args(id, request)")
     public void auditPasswordChange(Long id, Object request) {
-        // Check if password field is present in request
-        log.info("SECURITY [PASSWORD_CHANGE_ATTEMPT] - UserID: {}, Timestamp: {}", 
+        log.info("SECURITY [PASSWORD_CHANGE_ATTEMPT] - UserID: {}, Timestamp: {}",
                  id,
                  LocalDateTime.now());
     }
