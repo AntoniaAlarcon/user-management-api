@@ -32,6 +32,22 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Controller tests using @WebMvcTest.
+ *
+ * NOTE: These tests currently have a configuration conflict with Springdoc OpenAPI
+ * and @EnableJpaAuditing. The issue is that @WebMvcTest tries to load a minimal
+ * context, but Springdoc triggers JPA initialization which requires a full database
+ * context. This is a known limitation of @WebMvcTest with JPA auditing enabled.
+ *
+ * Possible solutions (for future refactoring):
+ * - Use @SpringBootTest instead of @WebMvcTest (slower but more complete)
+ * - Create a separate test configuration that disables @EnableJpaAuditing
+ * - Use @DataJpaTest for repository tests and keep service tests (which work fine)
+ *
+ * Service layer tests (UserServiceImplTest, etc.) work correctly and provide
+ * comprehensive coverage of business logic.
+ */
 @WebMvcTest(
     controllers = RoleController.class,
     excludeAutoConfiguration = {

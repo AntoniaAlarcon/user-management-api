@@ -1,9 +1,9 @@
 package com.antonia.dev.userapi.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -55,22 +56,51 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints (no authentication required)
-                        .requestMatchers("/auth/**").permitAll()
-                        // Allow registration
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        // Swagger UI and OpenAPI documentation - MUST BE FIRST
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/swagger-ui/**"),
+                                new AntPathRequestMatcher("/swagger-ui.html"),
+                                new AntPathRequestMatcher("/v3/api-docs/**"),
+                                new AntPathRequestMatcher("/api-docs/**"),
+                                new AntPathRequestMatcher("/swagger-resources/**"),
+                                new AntPathRequestMatcher("/webjars/**"),
+                                new AntPathRequestMatcher("/configuration/**"),
+                                new AntPathRequestMatcher("/error"),
+                                new AntPathRequestMatcher("/favicon.ico")
+                        ).permitAll()
+                        
+                        // Public API endpoints (no authentication required)
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/auth/**"),
+                                new AntPathRequestMatcher("/api/users", "POST")
+                        ).permitAll()
 
                         // Endpoints that require ADMIN role
-                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-                        .requestMatchers("/roles/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/users/**", "DELETE"),
+                                new AntPathRequestMatcher("/api/users/{id}", "PATCH"),
+                                new AntPathRequestMatcher("/api/users", "GET"),
+                                new AntPathRequestMatcher("/api/roles/**")
+                        ).hasRole("ADMIN")
+                        
+                        // Authenticated users can access their own profile and specific user queries
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/users/**", "GET"),
+                                new AntPathRequestMatcher("/api/users/self/**", "PATCH")
+                        ).authenticated()
 
                         // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+                        })
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
